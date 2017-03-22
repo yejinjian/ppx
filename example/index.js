@@ -1,6 +1,7 @@
 import Store from '../src/index';
 import React from 'react';
 import ReactDom from 'react-dom';
+
 import Page from './models/page';
 import TestDom from './view/test';
 

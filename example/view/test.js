@@ -12,12 +12,11 @@ class Test extends React.Component {
   }
   handleDel(e) {
     const {dispatch} = this.props;
-    dispatch({type: 'app/del'});
+    dispatch({type: 'app/minus'});
   }
 
   render() {
     const {page} = this.props;
-    console.log(page);
     const {a} = page;
     return (
       <div>

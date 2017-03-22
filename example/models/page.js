@@ -6,21 +6,26 @@ export default class Model {
       b: 2
     }
   }
-  add() {
-    return new Promise((resolve)=>{
-      setTimeout(()=>{
-        const state= this.state;
-        resolve ({
+  sleep (time) {
+    const self = this;
+    return new Promise( (resolve, reject) => {
+      setTimeout(()=> {
+        const state = self.state;
+        resolve({
           ...state,
-          a: state.a+1,
+          a: state.a+1
         });
-      }, 1000);
+      }, time);
     })
   }
 
-  async del(){
+  async add() {
+    return await this.sleep(1000)
+  }
+
+  minus(){
     const state= this.state;
-    return await {
+    return {
       ...state,
       a: state.a-1
     }
