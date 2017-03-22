@@ -18,7 +18,7 @@ class Model {
     };
   }
 
-  del(state){
+  minus(state){
     return {
       ...state,
       a: state.a-1
@@ -57,7 +57,7 @@ class Test extends React.Component {
   }
   handleDel(e) {
     const {dispatch} = this.props;
-    dispatch({type: 'app/del'});
+    dispatch({type: 'app/minus'});
   }
 
   render() {
@@ -68,7 +68,7 @@ class Test extends React.Component {
       <div>
         <p>a: {a}</p>
         <a onClick={this.handleAdd.bind(this)}>增加</a>
-        <a onClick={this.handleDel.bind(this)}>减少</a>
+        <a onClick={this.handleMinus.bind(this)}>减少</a>
       </div>
     );
   }
