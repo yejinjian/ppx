@@ -11,12 +11,21 @@ class Model {
     }
   }
 
-  async add(state) {
-    return await {
-      ...state,
-      a: state.a+1,
-    };
+  sleep (state, time) {
+      return new Promise(function (resolve, reject) {
+          setTimeout(function () {
+              resolve({
+                ...state,
+                a: state.a+1
+              });
+          }, time);
+      })
   }
+
+  async add(state) {
+    return await this.sleep(state ,1000)
+  }
+
 
   minus(state){
     return {
@@ -55,7 +64,8 @@ class Test extends React.Component {
     const {dispatch} = this.props;
     dispatch({type: 'app/add'});
   }
-  handleDel(e) {
+
+  handleMinus(e) {
     const {dispatch} = this.props;
     dispatch({type: 'app/minus'});
   }

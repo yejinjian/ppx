@@ -67,7 +67,7 @@ export default {
     if (!model) {
       throw Error(`can't find the model "${namespace}"`);
     }
-    return middle.go(model[reduce], {
+    return middle.go(model[reduce].bind(model), {
       model: model,
       state: model.state,
       action: action,
