@@ -4,8 +4,8 @@ export  default  class Middleware {
   }
 
   go(next, data) {
-    const {state, action} = data;
-    return next(state, action);
+    const {action} = data;
+    return next(action);
   }
 
   use(...middlewares) {
@@ -15,7 +15,7 @@ export  default  class Middleware {
       }
       this.middlewares.push(middleware);
       this.go = ((stack) => (next, data) => stack(()=> {
-        return middleware.call(data, next, data.state, data.action);
+        return middleware.call(data, next, data.action);
       }, data))(this.go);
     });
     return this;

@@ -5,8 +5,8 @@ const _store = {};
 const middle = new middleware();
 
 //插件
-const plugin = async function (next, state, action) {
-  const data = await next(state, action);
+const plugin = async function (next, action) {
+  const data = await next(action);
   this.model && (this.model.state = data);
   const retState = {};
   retState[this.model.namespace] = data;
@@ -67,9 +67,8 @@ export default {
     if (!model) {
       throw Error(`can't find the model "${namespace}"`);
     }
-    return middle.go(model[reduce], {
+    return middle.go(model[reduce].bind(model), {
       model: model,
-      state: model.state,
       action: action,
     });
   }
