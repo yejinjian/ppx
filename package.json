@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rm -rf lib && cross-env babel src --out-dir lib",
-    "demo": "webpack-dev-server --config ./example/webpack.config.js --content-base ./example --inline --hot --quiet --port 8001"
+    "demo": "webpack-dev-server --config ./example/webpack.config.js --content-base ./example --inline --hot --quiet --port 8010"
   },
   "repository": {
     "type": "git",
