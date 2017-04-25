@@ -4,7 +4,10 @@ export default class Model {
     this.state = {
       a: 1,
       b: 2
-    }
+    };
+  }
+  bootstrap(){
+    this.dispatch('add');
   }
   sleep (time) {
     const self = this;
@@ -20,14 +23,14 @@ export default class Model {
   }
 
   async add() {
-    return await this.sleep(1000)
+    return await this.sleep(800)
   }
 
   minus(){
     const state= this.state;
     return {
       ...state,
-      a: state.a-1
+      a: state.a - 1
     }
   }
 }

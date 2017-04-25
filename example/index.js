@@ -10,9 +10,9 @@ Store.model(Page);
 
 //加载中间件
 Store.use(async(next, action)=> {
-  console.log('plguin start:', action);
+  console.log('plugin start:', action);
   const data = await next(action);
-  console.log('plguin end:', data);
+  console.log('plugin end:', data);
   return data;
 });
 

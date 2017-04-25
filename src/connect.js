@@ -12,20 +12,20 @@ class Connect extends React.Component {
     this.Store = Store;
 
     const models = typeof  filter == 'function' ? filter(Store._store) : Store._store;
-    console.log(Store._store);
     let state = {};
     for (var i in models) {
       state[i] = models[i].state;
     }
     this.state = state;
-  }
-
-  dispatch(action) {
-    return this.Store.dispatch(action).then((data)=> {
-      const filter = this.props.filter;
+    this.Store.subscribe((data)=> {
+      const {filter} = this.props;
       data = filter?filter(data):data;
       this.setState(data);
     })
+  }
+
+  dispatch(action) {
+    return this.Store.dispatch(action)
   }
 
   render() {
