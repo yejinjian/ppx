@@ -3,11 +3,22 @@ export  default  class Middleware {
     this.middlewares = [];
   }
 
+	/**
+   *
+	 * @param next
+	 * @param data
+	 * @returns {*}
+	 */
   go(next, data) {
     const {action} = data;
     return next(action);
   }
 
+	/**
+   * 中间件封装
+	 * @param middlewares
+	 * @returns {Middleware}
+	 */
   use(...middlewares) {
     middlewares.map((middleware)=> {
       if (typeof middleware !== 'function') {

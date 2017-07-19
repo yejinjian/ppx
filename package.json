@@ -1,8 +1,8 @@
 {
   "name": "ppx",
-  "version": "1.0.2",
+  "version": "1.0.5",
   "description": "ppx flux redux react",
-  "main": "lib/store.js",
+  "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rm -rf lib && cross-env babel src --out-dir lib",
@@ -17,6 +17,11 @@
     "flux",
     "redux",
     "react"
+  ],
+  "files": [
+    "dist",
+    "src",
+    "lib"
   ],
   "author": "tianwu",
   "license": "ISC",
@@ -35,12 +40,7 @@
     "babel-plugin-async-to-promises": "^1.0.5",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-preset-es2015": "^6.24.0",
-    "babel-preset-react": "^6.23.0",
-    "cross-env": "^3.2.4",
-    "react": "^15.4.2",
-    "react-dom": "^15.4.2",
-    "webpack": "^2.3.0",
-    "webpack-dev-server": "^2.4.2"
+    "babel-preset-react": "^6.23.0"
   },
   "dependencies": {
     "promise-polyfill": "^6.0.2"

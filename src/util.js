@@ -5,7 +5,7 @@
 const hasSetImmediate = typeof window.setImmediate === 'function' && window.setImmediate;
 const hasNextTick = typeof process === 'object' && typeof process.nextTick === 'function';
 
-var defer;
+let defer;
 if (hasSetImmediate) {
   defer = window.setImmediate;
 } else if (hasNextTick) {
