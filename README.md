@@ -20,14 +20,16 @@ model引用
     import Store from 'ppx';
     var model = {
         namespace: 'model1',
-        test: funtion (state,action){
+        test: funtion (action){
+            cosnt state = this.state;
             return {
                 ...state,
                 aciton.test
             }
         }
-        post: function(state,action){
+        post: function(action){
             return Ajax(url).then(function(rep){
+                const state = this.state;
                 return {
                     ...state,
                     a: rep.a
