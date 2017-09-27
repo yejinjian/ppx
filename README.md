@@ -18,18 +18,21 @@ ppx(皮皮虾)是一个遵循flux思想的数据管理工具。
 model引用
 ```
     import Store from 'ppx';
-    var model = {
-        namespace: 'model1',
-        test: funtion (action){
-            cosnt state = this.state;
+    class App {
+        constructor() {
+            this.state = {
+              a: 1,
+              b: 2
+            };
+        }
+        test(state, action){
             return {
                 ...state,
                 aciton.test
             }
         }
-        post: function(action){
-            return Ajax(url).then(function(rep){
-                const state = this.state;
+        post (state, action){
+            return Ajax(action.url).then(function(rep){
                 return {
                     ...state,
                     a: rep.a
@@ -37,7 +40,7 @@ model引用
             })
         }
     }
-    Store.model(model);
+    Store.model(App);
 ```
 
 middleware引用
@@ -85,8 +88,8 @@ class Test extends React.Component {
   }
 }
 
-export default connect(({app})=>{
-  return {page:app}
+export default connect(({App})=>{
+  return {page:App}
 })(Test);
 ```
 
