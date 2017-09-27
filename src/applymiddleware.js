@@ -10,8 +10,7 @@ export  default  class Middleware {
 	 * @returns {*}
 	 */
   go(next, data) {
-    const {action} = data;
-    return next(action);
+    return next(data);
   }
 
 	/**
@@ -26,7 +25,7 @@ export  default  class Middleware {
       }
       this.middlewares.push(middleware);
       this.go = ((stack) => (next, data) => stack(()=> {
-        return middleware.call(data, next, data.action);
+        return middleware.call(data, next, data);
       }, data))(this.go);
     });
     return this;

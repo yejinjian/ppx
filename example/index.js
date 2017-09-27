@@ -9,11 +9,11 @@ import TestDom from './view/test';
 Store.model(Page);
 
 //加载中间件
-Store.use(async(next, action)=> {
-  console.log('plugin start:', action);
-  const data = await next(action);
-  console.log('plugin end:', data);
-  return data;
-});
+//Store.use(async(next, action)=> {
+//  console.log('plugin start:', action);
+//  const data = await next(action);
+//  console.log('plugin end:', data);
+//  return data;
+//});
 
 ReactDom.render((<TestDom />),document.getElementById("main"));

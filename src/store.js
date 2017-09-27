@@ -7,11 +7,15 @@ const _fn = [];
 const middle = new middleware();
 
 //插件用于数据save与返回promise
-const plugin = async function (next, action) {
-	const data = await next(action);
-	this.model && (this.model.state = data);
+const plugin = async (next, data) => {
+	const { action, model } = data;
+	const ret = await next(data);
+	// 修改值
+	model && (model.state = Object.assign(model.state, ret));
+	console.log('plugin:',JSON.stringify(model.state));
 	const retState = {};
-	retState[this.model.namespace] = data;
+	const [namespace, reduce] = action.type.split('/');
+	retState[namespace] = ret;
 	return retState;
 };
 middle.use(plugin);
@@ -19,28 +23,28 @@ middle.use(plugin);
 /**
  * 事件派送
  * @param action
- * @returns {*}
+ * @param params
+ * @returns {Promise.<TResult>|PromiseLike<T>}
  */
 const dispatch = (action, ...params) => {
+	//兼容字符串
 	if (typeof action === 'string') {
 		action = { type: action, params };
 	}
-	const [namespace, reduce] = action.type.split('/');
+	const { type } = action;
+	const [namespace, reduce] = type.split('/');
 	if (!namespace || !reduce) {
-		throw Error(`action ${action.type} should like "namespace/reduce"`);
+		throw Error(`action ${type} should like "namespace/reduce"`);
 	}
 	//中间件应用
 	const model = _store[namespace];
 	if (!model) {
 		throw Error(`can't find the model "${namespace}"`);
 	}
-	return middle.go((action) => {
-		let s = model[reduce].call(model, action);
-		//解决同步返回时的state未修改问题
-		if (s && !s.then) {
-			model.state = s;
-		}
-		return s;
+	return middle.go(({ action, model }) => {
+		const { type } = action;
+		const [namespace, reduce] = type.split('/');
+		return model[reduce].call(model,model.state, action);
 	}, {
 		model: model,
 		action: action
@@ -58,41 +62,42 @@ const dispatch = (action, ...params) => {
  * @param replace
  * @returns {boolean}
  */
-const model = (model, replace = false) => {
-
-	if (!model) {
-		console.warn(`add null model: ${model}`);
+const model = (Model, replace = false) => {
+	if (!Model) {
+		console.warn(`add null model: ${Model}`);
 		return false;
 	}
-	if (typeof model === 'function') {
-		model = new model();
+	let model = Model;
+	if (typeof Model === 'function') {
+		model = new Model();
 	}
-
-	const { namespace } = model;
-	if (!namespace) {
+	const { constructor } = model;
+	if (!constructor || !constructor.name) {
 		console.warn(`It is not a model: ${model}`);
 		return false;
 	}
-
+	const namespace = constructor.name;
 	if (!replace && _store[namespace]) {
 		console.warn(`Have use this model before: ${model}`);
 		return false;
 	}
 	/**
-	 * model 内触发 dispath;
+	 * model 内触发 dispath
 	 * @param action
+	 * @param params
+	 * @returns {Promise.<TResult>|PromiseLike.<T>}
 	 */
-	model.dispatch = (action) => {
+	model.dispatch = (action,...params) => {
 		if (typeof action === 'string') {
 			const type = `${namespace}/${action}`;
-			action = { type };
+			action = { type, params };
 		} else {
 			let { type } = action;
 			if (type) {
 				action.type = `${namespace}/${type}`;
 			}
 		}
-		return dispatch(action);
+		return dispatch(action, ...params);
 	};
 	// save
 	_store[namespace] = model;

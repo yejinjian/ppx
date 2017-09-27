@@ -1,6 +1,5 @@
-export default class Model {
+export default class app {
   constructor() {
-    this.namespace = 'app';
     this.state = {
       a: 1,
       b: 2
@@ -9,11 +8,10 @@ export default class Model {
   bootstrap(){
     this.dispatch('add');
   }
-  sleep (time) {
-    const self = this;
+  sleep (time, model) {
     return new Promise( (resolve, reject) => {
+	    const state = model;
       setTimeout(()=> {
-        const state = self.state;
         resolve({
           ...state,
           a: state.a+1
@@ -22,12 +20,11 @@ export default class Model {
     })
   }
 
-  async add() {
-    return await this.sleep(800)
+  async add(state, action) {
+    return await this.sleep(1000, state)
   }
 
-  minus(){
-    const state= this.state;
+  minus(state, action){
     return {
       ...state,
       a: state.a - 1
