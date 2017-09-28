@@ -7,16 +7,19 @@ const _fn = [];
 const middle = new middleware();
 
 //插件用于数据save与返回promise
-const plugin = async (next, data) => {
-	const { action, model } = data;
-	const ret = await next(data);
+const plugin = async function (next, action) {
+	const ret = await next(action);
+	let {state} = this;
 	// 修改值
-	model && (model.state = Object.assign(model.state, ret));
-	console.log('plugin:',JSON.stringify(model.state));
+	this.state = Object.assign(state, ret);
 	const retState = {};
 	const [namespace, reduce] = action.type.split('/');
 	retState[namespace] = ret;
-	return retState;
+	//触发 subcribe
+	_fn.map((fn) => {
+		fn(retState);
+	});
+	return ret;
 };
 middle.use(plugin);
 
@@ -41,18 +44,14 @@ const dispatch = (action, ...params) => {
 	if (!model) {
 		throw Error(`can't find the model "${namespace}"`);
 	}
-	return middle.go(({ action, model }) => {
+	return middle.go(function (action) {
 		const { type } = action;
 		const [namespace, reduce] = type.split('/');
-		return model[reduce].call(model,model.state, action);
+		console.log(this);
+		return this[reduce].call(this, model.state, action);
 	}, {
 		model: model,
 		action: action
-	}).then((data) => {
-		//触发 subcribe
-		_fn.map((fn) => {
-			fn(data);
-		});
 	});
 };
 

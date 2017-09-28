@@ -25,7 +25,7 @@ export  default  class Middleware {
       }
       this.middlewares.push(middleware);
       this.go = ((stack) => (next, data) => stack(()=> {
-        return middleware.call(data, next, data);
+        return middleware.call(data.model, next.bind(data.model), data.action);
       }, data))(this.go);
     });
     return this;
