@@ -27,11 +27,9 @@ class Connect extends React.Component {
 	 * 监听store 变化
 	 */
 	subscribe(){
-		console.log("test");
 		this.Store.subscribe((data) => {
 			const { filter} = this.props;
 			data = filter ? filter(data) : data;
-			console.log(data);
 			if(data){
 				this.setState(data);
 			}
