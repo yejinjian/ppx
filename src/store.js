@@ -1,38 +1,72 @@
 import 'promise-polyfill';
 import middleware from './applymiddleware';
-import { defer } from './util';
+import Util  from './util';
 
 const _store = {};
 const _fn = [];
 const middle = new middleware();
 
 //插件用于数据save与返回promise
-const plugin = async function (next, action) {
+const plugin = async function(next, action) {
 	const ret = await next(action);
-	let {state} = this;
-	// 修改值
+	let { state } = this;
+	if(ret === undefined){
+		return ;
+	}
 	this.state = Object.assign(state, ret);
-	const retState = {};
-	const [namespace, reduce] = action.type.split('/');
-	retState[namespace] = ret;
-	//触发 subcribe
-	_fn.map((fn) => {
-		fn(retState);
-	});
+	// 修改值
+	triggerSubscribe(action, ret);
 	return ret;
 };
 middle.use(plugin);
 
 /**
+ * 触发 subscribe
+ * @param action
+ * @param ret
+ */
+const triggerSubscribe = (action, ret)=>{
+	const retState = {};
+	const [namespace, reduce] = action.type.split('/');
+	retState[namespace] = ret;
+	//触发 subscribe
+	_fn.map((fn) => {
+		fn(retState);
+	});
+};
+
+/**
+ *
+ * @param namespace
+ * @returns {function(*=, ...[*])}
+ * @private
+ */
+const _addDispatch = (namespace)=>{
+	return (action, ...params) => {
+		if (typeof action === 'string') {
+			const type = `${namespace}/${action}`;
+			action = { type, params };
+		} else {
+			let { type } = action;
+			if (type) {
+				action.type = `${namespace}/${type}`;
+			}
+		}
+		return dispatch(action, ...params);
+	}
+};
+
+
+/**
  * 事件派送
  * @param action
- * @param params
+ * @param params //当action 是字符串时被使用
  * @returns {Promise.<TResult>|PromiseLike<T>}
  */
-const dispatch = (action, ...params) => {
+const dispatch = (action, ...data) => {
 	//兼容字符串
 	if (typeof action === 'string') {
-		action = { type: action, params };
+		action = { type: action, data };
 	}
 	const { type } = action;
 	const [namespace, reduce] = type.split('/');
@@ -44,10 +78,9 @@ const dispatch = (action, ...params) => {
 	if (!model) {
 		throw Error(`can't find the model "${namespace}"`);
 	}
-	return middle.go(function (action) {
+	return middle.go(function(action) {
 		const { type } = action;
 		const [namespace, reduce] = type.split('/');
-		console.log(this);
 		return this[reduce].call(this, model.state, action);
 	}, {
 		model: model,
@@ -70,39 +103,29 @@ const model = (Model, replace = false) => {
 	if (typeof Model === 'function') {
 		model = new Model();
 	}
-	const { constructor } = model;
-	if (!constructor || !constructor.name) {
-		console.warn(`It is not a model: ${model}`);
-		return false;
+
+	// namespace
+	let { namespace, constructor } = model;
+	if (constructor && constructor.name) {
+		namespace = constructor.name;
 	}
-	const namespace = constructor.name;
+	if (!namespace) {
+		throw new Error(`It is not a model: ${model}`);
+	}
+
 	if (!replace && _store[namespace]) {
 		console.warn(`Have use this model before: ${model}`);
 		return false;
 	}
-	/**
-	 * model 内触发 dispath
-	 * @param action
-	 * @param params
-	 * @returns {Promise.<TResult>|PromiseLike.<T>}
-	 */
-	model.dispatch = (action,...params) => {
-		if (typeof action === 'string') {
-			const type = `${namespace}/${action}`;
-			action = { type, params };
-		} else {
-			let { type } = action;
-			if (type) {
-				action.type = `${namespace}/${type}`;
-			}
-		}
-		return dispatch(action, ...params);
-	};
+	// save namespace;
+	model.namespace = namespace;
+	// 不鼓励在model中使用dispatch 但是想来会有复杂需求使用到
+	model.dispatch = _addDispatch(namespace);
 	// save
 	_store[namespace] = model;
-	// model 触发事件调用
+	// model 触发事件调用 不鼓励使用
 	if (typeof model.bootstrap === 'function') {
-		defer(model.bootstrap.bind(model));
+		Util.defer(model.bootstrap.bind(model));
 	}
 };
 
@@ -116,6 +139,7 @@ const subscribe = (fn) => {
 	}
 	_fn.push(fn);
 };
+
 /**
  * 插件加载
  * @param middlewares

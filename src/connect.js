@@ -4,13 +4,14 @@
 
 import Store from './store';
 import React from 'react';
+
 /**
  * 目前只包了react版本
  */
 class Connect extends React.Component {
 	constructor(props) {
 		super(props);
-		const { filter, Store } = props;
+		const { filter } = props;
 		this.Store = Store;
 
 		const models = typeof filter === 'function' ? filter(Store._store) : Store._store;
@@ -19,10 +20,21 @@ class Connect extends React.Component {
 			state[i] = models[i].state;
 		}
 		this.state = state;
+		this.subscribe();
+	}
+
+	/**
+	 * 监听store 变化
+	 */
+	subscribe(){
+		console.log("test");
 		this.Store.subscribe((data) => {
-			const { filter } = this.props;
+			const { filter} = this.props;
 			data = filter ? filter(data) : data;
-			this.setState(data);
+			console.log(data);
+			if(data){
+				this.setState(data);
+			}
 		});
 	}
 
@@ -40,7 +52,7 @@ class Connect extends React.Component {
 export default (filter) => {
 	return (View) => {
 		return function () {
-			return (<Connect Store={Store} View={View} filter={filter}/>);
+			return (<Connect View={View} filter={filter}/>);
 		};
 	};
 }
