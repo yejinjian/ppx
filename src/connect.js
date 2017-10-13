@@ -41,9 +41,9 @@ class Connect extends React.Component {
 	}
 
 	render() {
-		const { View } = this.props;
+		const { View, filter, children, ...others } = this.props;
 		const { ...state } = this.state;
-		return (<View dispatch={this.dispatch.bind(this)} {...state} />);
+		return (<View dispatch={this.dispatch.bind(this)} {...state} {...others} >{children}</View>);
 	}
 }
 
