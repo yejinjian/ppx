@@ -42,15 +42,16 @@ class Connect extends React.Component {
 
 	render() {
 		const { View, filter, children, ...others } = this.props;
+        console.log(this.props);
 		const { ...state } = this.state;
-		return (<View dispatch={this.dispatch.bind(this)} {...state} {...others} >{children}</View>);
+		return (<View dispatch={this.dispatch.bind(this)} {...state} {...others} />);
 	}
 }
 
 export default (filter) => {
 	return (View) => {
-		return function () {
-			return (<Connect View={View} filter={filter}/>);
+		return function (props) {
+			return (<Connect {...props} View={View} filter={filter}/>);
 		};
 	};
 }

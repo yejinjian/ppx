@@ -17,6 +17,7 @@ class Test extends React.Component {
 
   render() {
     const {page} = this.props;
+    console.log(this.props);
     const {a} = page;
     return (
       <div>

@@ -18,4 +18,4 @@ Store.use(DiffMid(true));
 //  return data;
 //});
 
-ReactDom.render((<TestDom />),document.getElementById("main"));
+ReactDom.render((<TestDom test="1" />),document.getElementById("main"));
