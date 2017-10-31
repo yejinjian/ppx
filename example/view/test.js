@@ -2,8 +2,8 @@ import React from 'react';
 import {connect} from '../../src/index';
 
 class Test extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor(props,context) {
+    super(props,context);
   }
 
   handleAdd(e) {
@@ -17,11 +17,10 @@ class Test extends React.Component {
 
   render() {
     const {page} = this.props;
-    console.log(this.props);
     const {a} = page;
     return (
       <div>
-        <p>a: {a}</p>
+        <p>a:{a}</p>
         <a onClick={this.handleAdd.bind(this)}>增加</a>
         <a onClick={this.handleDel.bind(this)}>减少</a>
       </div>

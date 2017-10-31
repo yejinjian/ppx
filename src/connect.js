@@ -4,12 +4,11 @@
 
 import Store from './store';
 import React from 'react';
-
 /**
  * 目前只包了react版本
  */
 class Connect extends React.Component {
-	constructor(props) {
+    constructor(props) {
 		super(props);
 		const { filter } = props;
 		this.Store = Store;
@@ -36,14 +35,11 @@ class Connect extends React.Component {
 		});
 	}
 
-	dispatch(action) {
-		return this.Store.dispatch(action);
-	}
-
 	render() {
 		const { View, filter, children, ...others } = this.props;
 		const { ...state } = this.state;
-		return (<View dispatch={this.dispatch.bind(this)} {...state} {...others} />);
+		const {dispatch} = this.Store;
+		return (<View dispatch={dispatch} {...state} {...others} />);
 	}
 }
 
