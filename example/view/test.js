@@ -19,7 +19,6 @@ class Test extends React.Component {
 
   render() {
     const {App} = this.props;
-
     const {a} = App;
     return (
       <div>

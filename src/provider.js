@@ -41,7 +41,6 @@ export default class Provider extends React.Component {
      */
     subscribe() {
         Store.subscribe((action, data) => {
-            console.log(action, data);
             if (this.models) {
                 // 只对关注的models监听
                 const [namespace, reduce] = action.type.split('/');
@@ -59,10 +58,10 @@ export default class Provider extends React.Component {
     }
 
     render() {
-        const { children } = this.props;
+        const { children, ...others } = this.props;
         const { ...state } = this.state;
         const { dispatch } = Store;
-        return React.cloneElement(children, { dispatch, ...state });
+        return React.cloneElement(children, { ...others, dispatch, ...state });
     }
 }
 

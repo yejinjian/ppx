@@ -30,7 +30,6 @@ const triggerSubscribe = (action, ret) => {
     const [namespace, reduce] = action.type.split('/');
     retState[namespace] = ret;
     //触发 subscribe
-    console.log("mid", _fn);
     _fn.map((fn) => {
         fn(action, retState);
     });
