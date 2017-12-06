@@ -3,6 +3,8 @@
  */
 import Store from './store';
 import connect from './connect';
+import Provider from './provider';
 
 Store.connect= connect;
+Store.Provider= Provider;
 export default Store;

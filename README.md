@@ -1,5 +1,6 @@
 ## 设计概要
 ppx(皮皮虾)是一个遵循flux思想的数据管理工具。
+
 * one store 原则
   不同于redux, 我们摒弃reduce 的设计，改用了model的思想，考虑到model与view存在多对多的情况， 统一由一个store管理
 * suport middleware
@@ -96,4 +97,4 @@ export default connect(({App})=>{
 ##感谢：
 * 感谢 [darrenscerri](https://gist.github.com/darrenscerri/5c3b3dcbe4d370435cfa) 提供的异步中间件思路
 * 本库的flux思路类似于[dva](https://github.com/dvajs/dva), 只是有别与dva的redux与redux-saga的思路 ppx使用更加简单
-* 感谢离职同事的贡献，所以本库任性的安装他的绰号取名
+* 感谢离职同事的贡献，所以本库任性的按照他的绰号取名

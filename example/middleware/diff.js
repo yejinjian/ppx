@@ -10,8 +10,7 @@ export default function(globalOnly = false) {
 		const { type } = action;
 		if (globalOnly || action.only) {
 			if (actions[type]) {
-				console.warn(' %o is on trigger', action);
-				return ;
+                return actions[type];
 			}
 		}
 		return actions[type] = Promise.resolve().then(()=>{
@@ -19,6 +18,9 @@ export default function(globalOnly = false) {
 		}).then((ret)=>{
 			delete actions[type];
 			return ret;
+		},(error)=>{
+            delete actions[type];
+            throw error;
 		})
 	};
 }

@@ -1,6 +1,7 @@
 import React from 'react';
-import {connect} from '../../src/index';
+import { connect } from '../../src/index';
 
+@connect()
 class Test extends React.Component {
   constructor(props,context) {
     super(props,context);
@@ -8,16 +9,18 @@ class Test extends React.Component {
 
   handleAdd(e) {
     const {dispatch} = this.props;
-    dispatch({type: 'app/add'});
+    dispatch({type: 'App/add'});
   }
+
   handleDel(e) {
     const {dispatch} = this.props;
-    dispatch({type: 'app/minus'});
+    dispatch({type: 'App/minus'});
   }
 
   render() {
-    const {page} = this.props;
-    const {a} = page;
+    const {App} = this.props;
+
+    const {a} = App;
     return (
       <div>
         <p>a:{a}</p>
@@ -28,6 +31,4 @@ class Test extends React.Component {
   }
 }
 
-export default connect(({app})=>{
-  return {page:app}
-})(Test);
+export default Test;

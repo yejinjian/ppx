@@ -4,7 +4,7 @@ const sleep = (time = 0) => {
 	});
 };
 
-export default class app {
+export default class App {
 	constructor() {
 		this.state = {
 			a: 1,
@@ -13,21 +13,25 @@ export default class app {
 	}
 
 	bootstrap() {
+		//当model初始化后触发
 		this.dispatch('add');
 	}
 
-	async add(state, action) {
-		await sleep(2000);
-		return {
-			...state,
-			a: state.a +1
-		}
+	add(state, action) {
+        return sleep(1000).then(()=>{
+        	return {
+                ...state,
+                a: state.a +1
+            }
+		});
 	}
 
 	minus(state, action) {
-		return {
-			...state,
-			a: state.a - 1
-		};
+        return sleep(100).then(()=>{
+            return {
+                ...state,
+                a: state.a -1
+            }
+        });
 	}
 }
