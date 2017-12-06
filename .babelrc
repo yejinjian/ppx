@@ -4,6 +4,8 @@
     "async-to-promises",
     "transform-object-rest-spread",
     "transform-object-assign",
+    "transform-decorators-legacy",
+    "transform-class-properties",
     "add-module-exports"
   ]
 }
