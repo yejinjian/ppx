@@ -89,9 +89,7 @@ class Test extends React.Component {
   }
 }
 
-export default connect(({App})=>{
-  return {page:App}
-})(Test);
+export default connect(['App'])(Test);
 ```
 
 ##感谢：
