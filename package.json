@@ -1,6 +1,6 @@
 {
   "name": "ppx",
-  "version": "1.3.2",
+  "version": "2.0.0",
   "description": "ppx flux redux react",
   "main": "lib/index.js",
   "scripts": {

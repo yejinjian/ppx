@@ -2,10 +2,6 @@ import 'promise-polyfill';
 import middleware from './applymiddleware';
 import Util  from './util';
 
-const _store = {};
-const _fn = [];
-const middle = new middleware();
-
 //插件用于数据save与返回promise
 const plugin = async function(next, action) {
     const ret = await next(action);
@@ -13,154 +9,186 @@ const plugin = async function(next, action) {
     if (ret === undefined) {
         return;
     }
+    //更新 state 值
     this.state = Object.assign(state, ret);
     // 修改值
-    triggerSubscribe(action, ret);
+    // triggerSubscribe(action, ret);
     return ret;
 };
-middle.use(plugin);
 
-/**
- * 触发 subscribe
- * @param action
- * @param ret
- */
-const triggerSubscribe = (action, ret) => {
-    const retState = {};
-    const [namespace, reduce] = action.type.split('/');
-    retState[namespace] = ret;
-    //触发 subscribe
-    _fn.map((fn) => {
-        fn(action, retState);
-    });
-};
+class Store {
+    constructor() {
+        this._store = {};
+        this._fn = [];
+        this.middle = new middleware();
+        this.use(plugin);
+    }
 
-/**
- *
- * @param namespace
- * @returns {function(*=, ...[*])}
- * @private
- */
-const _addDispatch = (namespace) => {
-    return (action, ...params) => {
-        if (typeof action === 'string') {
-            const type = `${namespace}/${action}`;
-            action = { type, params };
-        } else {
-            let { type } = action;
-            if (type) {
-                action.type = `${namespace}/${type}`;
-            }
+    /**
+     * 获取model对象的namespace
+     * @param model
+     */
+    getRealModel(Model) {
+        // 类对象
+        let model = Model;
+        if (typeof Model === 'function') {
+            model = new Model();
         }
-        return dispatch(action, ...params);
-    };
-};
+        // 获取
+        let { namespace, constructor } = model;
+        if (constructor && constructor.name) {
+            namespace = constructor.name;
+        }
+        return {
+            namespace,
+            model
+        };
+    }
 
-/**
- * 事件派送
- * @param action
- * @param params //当action 是字符串时被使用
- * @returns {Promise.<TResult>|PromiseLike<T>}
- */
-const dispatch = (action, ...data) => {
-    //兼容字符串
-    if (typeof action === 'string') {
-        action = { type: action, data };
+    /**
+     * model 支持
+     * @param Model
+     * @param force 强制新建model
+     * @returns {*}
+     */
+    model(Model, force = false) {
+        // 支持多个model的情况
+        if (Model instanceof Array) {
+            return Model.map((oneModel) => {
+                return this.model(oneModel, force);
+            });
+        }
+
+        if (!Model) {
+            throw new Error(`${Model} is undefined`);
+        }
+        // 类对象
+        let model = Model;
+        if (typeof Model === 'function') {
+            model = new Model();
+        }
+        // 获取
+        let { namespace, constructor } = model;
+        if (constructor && constructor.name) {
+            namespace = constructor.name;
+        }
+
+        if (!namespace) {
+            throw new Error(`It is not a model: ${model}`);
+        }
+
+        if (!force && this._store[namespace]) {
+            // model已存在
+            return namespace;
+        }
+
+        // save namespace;
+        model.namespace = namespace;
+        // 不鼓励在model中使用dispatch 但是想来会有复杂需求使用到
+        model.dispatch = this._addDispatch(namespace);
+        // save
+        this._store[namespace] = model;
+        // model 触发事件调用 不鼓励使用
+        if (typeof model.bootstrap === 'function') {
+            Util.defer(model.bootstrap.bind(model));
+        }
+        return namespace;
     }
-    const { type } = action;
-    const [namespace, reduce] = type.split('/');
-    if (!namespace || !reduce) {
-        throw Error(`action ${type} should like "namespace/reduce"`);
+
+    /**
+     * 用于 model内部支持dispatch 方法
+     * @param namespace
+     * @returns {function(*=, ...[*])}
+     * @private
+     */
+    _addDispatch(namespace) {
+        return (action, ...params) => {
+            if (typeof action === 'string') {
+                const type = `${namespace}/${action}`;
+                action = { type, params };
+            } else {
+                let { type } = action;
+                if (type) {
+                    action.type = `${namespace}/${type}`;
+                }
+            }
+            return this.dispatch(action, ...params);
+        };
     }
-    //中间件应用
-    const model = _store[namespace];
-    if (!model) {
-        throw Error(`can't find the model "${namespace}"`);
+
+    /**
+     * 订阅
+     * @param fn
+     * @returns {function()}
+     */
+    subscribe(fn) {
+        if (typeof fn !== 'function') {
+            throw new Error('first argument of subscription should be a function');
+        }
+        this._fn.push(fn);
+
+        /**
+         * 取消订阅
+         */
+        return () => {
+            const index = this._fn.indexOf(fn);
+            this._fn.splice(index, 1);
+        };
     }
-    return middle.go(function(action) {
+
+    /**
+     *
+     * @param action
+     * @param data
+     * @returns {*}
+     */
+    dispatch(action, ...data) {
+        //兼容字符串
+        if (typeof action === 'string') {
+            action = { type: action, data };
+        }
         const { type } = action;
         const [namespace, reduce] = type.split('/');
-        return this[reduce].call(this, model.state, action);
-    }, {
-        model: model,
-        action: action
-    });
-};
-
-/**
- * model的加载
- * @param model
- * @param replace
- * @returns {boolean}
- */
-const model = (Model, replace = false) => {
-    if (!Model) {
-        console.warn(`add null model: ${Model}`);
-        return false;
-    }
-    let model = Model;
-    if (typeof Model === 'function') {
-        model = new Model();
-    }
-
-    // namespace
-    let { namespace, constructor } = model;
-    if (constructor && constructor.name) {
-        namespace = constructor.name;
-    }
-    if (!namespace) {
-        throw new Error(`It is not a model: ${model}`);
-    }
-
-    if (!replace && _store[namespace]) {
-        console.warn(`Have use this model before: ${model}`);
-        return false;
-    }
-    // save namespace;
-    model.namespace = namespace;
-    // 不鼓励在model中使用dispatch 但是想来会有复杂需求使用到
-    model.dispatch = _addDispatch(namespace);
-    // save
-    _store[namespace] = model;
-    // model 触发事件调用 不鼓励使用
-    if (typeof model.bootstrap === 'function') {
-        Util.defer(model.bootstrap.bind(model));
-    }
-};
-
-/**
- * 监听dispatch
- * @param fn
- */
-const subscribe = (fn) => {
-    if (typeof fn !== 'function') {
-        throw new Error('first argument of subcribe should be a function');
-    }
-    let isSubscribed = true;
-    _fn.push(fn);
-    return () => {
-        if (!isSubscribed) {
-            return;
+        if (!namespace || !reduce) {
+            throw Error(`action ${type} should like "namespace/reduce"`);
         }
-        isSubscribed = false;
-        const index = _fn.indexOf(fn);
-        _fn.splice(index, 1);
+        //
+        const model = this._store[namespace];
+        if (!model) {
+            throw Error(`can't find the model "${namespace}"`);
+        }
+        //中间件应用
+        return this.middle.go(function(action) {
+            const { type } = action;
+            const [namespace, reduce] = type.split('/');
+            const fn = this[reduce];
+            if (!fn) {
+                throw Error(`can't find function "${reduce}" in model "${namespace}"`);
+            }
+            return this[reduce].call(this, model.state, action);
+        }, {
+            model: model,
+            action: action
+        }).then((ret) => {
+            // 触发 subscribe
+            const retState = {};
+            const [namespace, reduce] = action.type.split('/');
+            retState[namespace] = ret;
+
+            this._fn.map((fn) => {
+                fn(action, retState);
+            });
+        });
     };
-};
 
-/**
- * 插件加载
- * @param middlewares
- */
-const use = (...middlewares) => {
-    middle.use(...middlewares);
-};
+    /**
+     * 加载中间件
+     * @param middleware
+     */
+    use(...middleware) {
+        this.middle.use(...middleware);
+        return this;
+    }
+}
 
-export default {
-    middle,
-    _store,
-    model,
-    dispatch,
-    subscribe,
-    use
-};
+export default new Store();

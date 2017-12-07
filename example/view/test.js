@@ -1,7 +1,8 @@
 import React from 'react';
 import { connect } from '../../src/index';
+import Page from '../models/page';
 
-@connect()
+@connect(Page)
 class Test extends React.Component {
   constructor(props,context) {
     super(props,context);

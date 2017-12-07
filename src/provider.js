@@ -4,25 +4,27 @@
 
 import Store from './store';
 import React from 'react';
+
 /**
  * 目前只包了react版本
  */
 export default class Provider extends React.Component {
     constructor(props, context) {
         super(props, context);
-        const { models } = props;
-        this.models = models instanceof Array ?
-            models :
-            (typeof models === 'string' ? [models] : null);
-        this.state = this.filterState();
+        const { models, force } = props;
+        this.models = models instanceof Array ? models : [models];
+        this.namespace = Store.model(this.models, force);
+        console.log(this.namespace);
         this.subscribe(models);
+        this.state = this.filterState();
     }
 
     filterState() {
         let { _store } = Store;
         const filterStore = Object.assign({}, _store);
-        if (this.models) {
-            this.models.map((modelKey) => {
+        if (this.namespace) {
+            this.namespace.map((modelKey) => {
+                console.log(modelKey);
                 if (_store[modelKey]) {
                     filterStore[modelKey] = _store[modelKey];
                 }
@@ -40,28 +42,32 @@ export default class Provider extends React.Component {
      * 监听store 变化
      */
     subscribe() {
-        Store.subscribe((action, data) => {
-            if (this.models) {
+        this.unSubscribe = Store.subscribe((action, data) => {
+            if (this.namespace) {
                 // 只对关注的models监听
                 const [namespace, reduce] = action.type.split('/');
-                if (this.models.indexOf(namespace) > -1) {
+                if (this.namespace.indexOf(namespace) > -1) {
                     this.setState(data);
                 }
                 return;
             }
             // 空关注全监听
             if (data) {
-
                 this.setState(data);
             }
         });
+    }
+
+    componentWillUnmount() {
+        this.unSubscribe();
     }
 
     render() {
         const { children, ...others } = this.props;
         const { ...state } = this.state;
         const { dispatch } = Store;
-        return React.cloneElement(children, { ...others, dispatch, ...state });
+        return React.cloneElement(children,
+            { ...others, dispatch: dispatch.bind(Store), ...state });
     }
 }
 

@@ -5,11 +5,12 @@
 import React from 'react';
 import Provider from './provider';
 
-export default (models) => {
+export default (models, force) => {
     return (View) => {
         return function(props) {
-            return (<Provider models={models} {...props} >
-                <View/>
+            const { children, ...other } = props;
+            return (<Provider models={models} force={force} {...other} >
+                <View>{children}</View>
             </Provider>);
         };
     };
