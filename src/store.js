@@ -68,6 +68,7 @@ class Store {
             model = new Model();
         }
         // 获取 这个在压缩时有坑
+        const {namespace} = model;
         //let { namespace, constructor } = model;
         //if (constructor && constructor.name) {
         //    namespace = constructor.name;

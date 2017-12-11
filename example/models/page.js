@@ -6,6 +6,7 @@ const sleep = (time = 0) => {
 
 export default class App {
 	constructor() {
+		this.namespace = 'App';
 		this.state = {
 			a: 1,
 			b: 2
