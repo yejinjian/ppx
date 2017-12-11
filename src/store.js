@@ -67,11 +67,11 @@ class Store {
         if (typeof Model === 'function') {
             model = new Model();
         }
-        // 获取
-        let { namespace, constructor } = model;
-        if (constructor && constructor.name) {
-            namespace = constructor.name;
-        }
+        // 获取 这个在压缩时有坑
+        //let { namespace, constructor } = model;
+        //if (constructor && constructor.name) {
+        //    namespace = constructor.name;
+        //}
 
         if (!namespace) {
             throw new Error(`It is not a model: ${model}`);
