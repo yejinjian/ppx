@@ -14,7 +14,6 @@ export default class Provider extends React.Component {
         const { models, force } = props;
         this.models = models instanceof Array ? models : [models];
         this.namespace = Store.model(this.models, force);
-        console.log(this.namespace);
         this.subscribe(models);
         this.state = this.filterState();
     }
@@ -24,7 +23,6 @@ export default class Provider extends React.Component {
         const filterStore = Object.assign({}, _store);
         if (this.namespace) {
             this.namespace.map((modelKey) => {
-                console.log(modelKey);
                 if (_store[modelKey]) {
                     filterStore[modelKey] = _store[modelKey];
                 }
