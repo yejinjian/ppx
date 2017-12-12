@@ -179,6 +179,7 @@ class Store {
             this._fn.map((fn) => {
                 fn(action, retState);
             });
+            return ret;
         });
     };
 
