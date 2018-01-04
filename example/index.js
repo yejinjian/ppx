@@ -14,4 +14,5 @@ import TestDom from './view/test';
 Store.use(DiffMid(true));
 Store.use(Log);
 
+
 ReactDom.render((<TestDom test="1" />),document.getElementById("main"));

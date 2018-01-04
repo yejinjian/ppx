@@ -6,6 +6,7 @@ import Page from '../models/page';
 class Test extends React.Component {
   constructor(props,context) {
     super(props,context);
+    console.log(this);
   }
 
   handleAdd(e) {

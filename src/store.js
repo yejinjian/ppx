@@ -97,6 +97,34 @@ class Store {
     }
 
     /**
+     * 获取namespace
+     * @returns {Iterator.<number>|Iterator.<K>|Iterator.<T>|*}
+     */
+    getNameSpace(){
+        return this._store.keys();
+    }
+
+    unmodel(Model){
+        if (Model instanceof Array) {
+            Model.map((oneModel) => {
+                this.unmodel(oneModel);
+            });
+            return this;
+        }
+        // 类对象
+        let model = Model;
+        if (typeof Model === 'function') {
+            model = new Model();
+        }
+        // 获取 这个在压缩时有坑
+        const {namespace} = model;
+        if(this._store[namespace]){
+            delete this._store[namespace];
+        }
+        return this;
+    }
+
+    /**
      * 用于 model内部支持dispatch 方法
      * @param namespace
      * @returns {function(*=, ...[*])}

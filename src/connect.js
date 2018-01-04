@@ -3,15 +3,16 @@
  */
 
 import React from 'react';
+import Store from './store';
 import Provider from './provider';
 
-export default (models, force) => {
-    return (View) => {
-        return function(props) {
-            const { children, ...other } = props;
-            return (<Provider models={models} force={force} {...other} >
-                <View>{children}</View>
-            </Provider>);
-        };
-    };
+export default (models, force = false) => (View) => (props, context) => {
+    const { children, ...other } = props;
+    // 这个是否需要,无法传递下去
+    if (View) {
+        View.prototype.dispatch = Store.dispatch.bind(View);
+    }
+    return (<Provider models={models} force={force} {...other} >
+        <View>{children}</View>
+    </Provider>);
 }

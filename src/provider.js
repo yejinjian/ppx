@@ -12,9 +12,11 @@ export default class Provider extends React.Component {
     constructor(props, context) {
         super(props, context);
         const { models, force } = props;
-        this.models = models instanceof Array ? models : [models];
-        this.namespace = Store.model(this.models, force);
-        this.subscribe(models);
+        if(models){
+            this.models = models instanceof Array ? models : [models];
+            this.namespace =  Store.model(this.models, force);
+        }
+        this.subscribe();
         this.state = this.filterState();
     }
 
