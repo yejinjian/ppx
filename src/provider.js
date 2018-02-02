@@ -4,7 +4,7 @@
 
 import Store from './store';
 import React from 'react';
-
+import PropTypes from 'prop-type';
 /**
  * 目前只包了react版本
  */
@@ -12,12 +12,23 @@ export default class Provider extends React.Component {
     constructor(props, context) {
         super(props, context);
         const { models, force } = props;
-        if(models){
+        if (models) {
             this.models = models instanceof Array ? models : [models];
-            this.namespace =  Store.model(this.models, force);
+            this.namespace = Store.model(this.models, force);
         }
         this.subscribe();
         this.state = this.filterState();
+    }
+
+    static childContextTypes = {
+        dispatch: PropTypes.func
+    };
+
+    getChildContext() {
+        const { dispatch } = Store;
+        return {
+            dispatch: dispatch.bind(Store)
+        };
     }
 
     filterState() {

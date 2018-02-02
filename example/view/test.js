@@ -1,16 +1,22 @@
 import React from 'react';
 import { connect } from '../../src/index';
+import PropTypes from 'prop-type';
 import Page from '../models/page';
 
 @connect(Page)
 class Test extends React.Component {
   constructor(props,context) {
     super(props,context);
+    console.log(context);
     console.log(this);
   }
 
+  static contextTypes ={
+    dispatch: PropTypes.func,
+  };
+
   handleAdd(e) {
-    const {dispatch} = this.props;
+    const {dispatch} = this.context;
     dispatch({type: 'App/add'});
   }
 

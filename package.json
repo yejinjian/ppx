@@ -1,6 +1,6 @@
 {
   "name": "ppx",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "ppx flux redux react",
   "main": "lib/index.js",
   "scripts": {
@@ -48,6 +48,9 @@
     "webpack-dev-server": "^2.9.5"
   },
   "dependencies": {
-    "promise-polyfill": "^6.1.0"
+    "promise-polyfill": "^6.1.0",
+    "prop-type": "0.0.1",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0"
   }
 }
