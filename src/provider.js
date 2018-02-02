@@ -4,7 +4,7 @@
 
 import Store from './store';
 import React from 'react';
-import PropTypes from 'prop-type';
+import PropTypes from 'prop-types';
 /**
  * 目前只包了react版本
  */

@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from '../../src/index';
-import PropTypes from 'prop-type';
+import PropTypes from 'prop-types';
 import Page from '../models/page';
 
 @connect(Page)
